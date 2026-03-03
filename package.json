@@ -1,0 +1,62 @@
+{
+  "name": "knowledge-graph-studio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean",
+    "doctor": "node scripts/doctor.js",
+    "db:generate": "supabase gen types typescript --local > packages/database/src/types.ts",
+    "db:migrate": "supabase db push",
+    "db:apply:cloud": "echo '📋 Cloud Mode: Apply migrations via Supabase Dashboard SQL Editor. See docs/CLOUD-MODE.md'",
+    "db:seed": "tsx infra/supabase/seed.ts",
+    "env:sync": "node scripts/env-sync.js",
+    "env:check": "node scripts/env-check.js",
+    "check:auth": "node scripts/verify-trigger.js",
+    "verify-trigger": "node scripts/verify-trigger.js",
+    "bootstrap:admin": "node scripts/bootstrap-admin.js",
+    "ops:check": "node scripts/ulimit-check.js",
+    "verify": "pnpm ops:check && pnpm env:check && pnpm -C apps/web lint && pnpm -C apps/web typecheck && pnpm -C apps/web build",
+    "smoke": "node scripts/smoke-test.js"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.0",
+    "eslint": "^8.57.0",
+    "prettier": "^3.2.0",
+    "supabase": "^1.142.0",
+    "tsx": "^4.7.0",
+    "turbo": "2.0.6",
+    "typescript": "~5.4.5"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@9.0.0",
+  "eslintConfig": {
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "parserOptions": {
+      "ecmaVersion": 2022,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "jsx": true
+      }
+    },
+    "plugins": ["@typescript-eslint"],
+    "extends": ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
+    "rules": {
+      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }],
+      "@typescript-eslint/no-unused-expressions": "error"
+    },
+    "ignorePatterns": ["node_modules/", ".next/", "dist/", "*.config.js", "*.config.ts", "scripts/"]
+  }
+}

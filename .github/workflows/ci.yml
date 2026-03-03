@@ -1,0 +1,82 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '9'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Check environment (skip if no .env)
+        run: pnpm env:check || echo "::warning::Skipping env check (no .env.local in CI)"
+      
+      - name: Lint
+        run: pnpm -C apps/web lint
+      
+      - name: Typecheck
+        run: pnpm -C apps/web typecheck
+      
+      - name: Build
+        run: pnpm -C apps/web build
+      
+      - name: Smoke test
+        run: |
+          echo "Starting smoke test..."
+          pnpm -C apps/web build
+          pnpm -C apps/web start &
+          SERVER_PID=$!
+          sleep 5
+          curl -fsS http://localhost:3000/auth/login > /dev/null
+          STATUS=$?
+          kill $SERVER_PID 2>/dev/null || true
+          if [ $STATUS -eq 0 ]; then
+            echo "✅ Smoke test PASSED"
+          else
+            echo "❌ Smoke test FAILED"
+            exit 1
+          fi
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Audit dependencies
+        run: pnpm audit --audit-level=high

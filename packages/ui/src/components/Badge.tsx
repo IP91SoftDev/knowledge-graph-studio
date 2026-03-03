@@ -1,0 +1,31 @@
+import { HTMLAttributes, forwardRef } from 'react';
+
+export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+  variant?: 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'danger';
+}
+
+export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(
+  ({ className = '', variant = 'default', ...props }, ref) => {
+    const baseStyles =
+      'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold transition-colors';
+
+    const variantStyles = {
+      default: 'bg-indigo-100 text-indigo-800',
+      secondary: 'bg-gray-100 text-gray-800',
+      outline: 'border border-gray-300 text-gray-700',
+      success: 'bg-green-100 text-green-800',
+      warning: 'bg-yellow-100 text-yellow-800',
+      danger: 'bg-red-100 text-red-800',
+    };
+
+    return (
+      <span
+        ref={ref}
+        className={`${baseStyles} ${variantStyles[variant]} ${className}`}
+        {...props}
+      />
+    );
+  }
+);
+
+Badge.displayName = 'Badge';
