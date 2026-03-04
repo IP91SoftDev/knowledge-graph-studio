@@ -2,7 +2,7 @@
 
 import { Progress } from '@/components/ui/progress'
 import { Button } from '@/components/ui/button'
-import { CPU, DollarSign, ChevronDown } from 'lucide-react'
+import { Cpu, DollarSign, ChevronDown } from 'lucide-react'
 
 interface AIStatusBarProps {
   queueCount: number
@@ -28,7 +28,7 @@ export function AIStatusBar({
     <div className="bg-surface border-b border-border px-6 py-3">
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          <CPU className="w-4 h-4 text-accent" />
+          <Cpu className="w-4 h-4 text-accent" />
           <span className="text-sm font-medium">AI Processing</span>
         </div>
         <Progress 
