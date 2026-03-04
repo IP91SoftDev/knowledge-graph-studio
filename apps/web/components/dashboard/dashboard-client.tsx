@@ -1,31 +1,86 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { 
-  pageLoadVariants, 
-  headerVariants, 
-  statusBarVariants,
-  statsCardVariants,
-  dataGridVariants,
-  activityFeedVariants,
-  accuracyChartVariants,
-  actionBarVariants 
-} from '@/lib/animations'
+import { pageLoadVariants } from '@/lib/animations'
+import { Sidebar } from '@/components/layout/sidebar'
 import { AIStatusBar } from './ai-status-bar'
-import { StatsCards } from './stats-cards'
-import { ResourceDatagrid } from './resource-datagrid'
+import { StatCard } from './stat-card'
+import { AccuracyAreaChart } from './accuracy-area-chart'
+import { ResourceTable } from './resource-table'
 import { ActivityFeed } from './activity-feed'
-import { AccuracyChart } from './accuracy-chart'
 import { ActionBar } from './action-bar'
+import { Database } from 'lucide-react'
+
+interface Resource {
+  id: string
+  title: string
+  status: 'verified' | 'review' | 'queue' | 'rejected'
+  category: string
+  aiConfidence: number
+  lastModified: Date
+  platform?: string
+}
 
 export function DashboardClient() {
-  // Mock data for now (will be replaced with real data from Supabase)
+  const [activeItem, setActiveItem] = useState('dashboard')
+
+  // Mock data
   const mockStats = {
-    verified: { count: 523, trend: 12.3, sparkline: [45, 52, 48, 61, 55, 67, 72] },
-    needsReview: { count: 234 },
-    aiQueue: { count: 127, status: 'Processing' },
-    rejected: { count: 89, trend: -2.1 }
+    total: { value: '19.5M', trend: '+12.3%', trendUp: true },
+    verified: { value: '847', trend: '+4.2%', trendUp: true },
+    queue: { value: '23', trend: '-2.1%', trendUp: false },
+    errors: { value: '12', trend: '-0.8%', trendUp: false },
   }
+
+  const mockChartData = [
+    { date: 'Mon', accuracy: 87.2 },
+    { date: 'Tue', accuracy: 89.5 },
+    { date: 'Wed', accuracy: 91.3 },
+    { date: 'Thu', accuracy: 88.7 },
+    { date: 'Fri', accuracy: 93.1 },
+    { date: 'Sat', accuracy: 94.8 },
+    { date: 'Sun', accuracy: 96.2 },
+  ]
+
+  const mockResources: Resource[] = [
+    {
+      id: '1',
+      title: 'API Documentation',
+      status: 'verified',
+      category: 'API',
+      aiConfidence: 95,
+      lastModified: new Date(Date.now() - 3600000 * 2),
+      platform: 'Web',
+    },
+    {
+      id: '2',
+      title: 'Database Schema',
+      status: 'review',
+      category: 'DB',
+      aiConfidence: 72,
+      lastModified: new Date(Date.now() - 3600000 * 24),
+      platform: 'Backend',
+    },
+    {
+      id: '3',
+      title: 'ML Model Config',
+      status: 'queue',
+      category: 'ML',
+      aiConfidence: 45,
+      lastModified: new Date(Date.now() - 3600000 * 48),
+      platform: 'AI',
+    },
+    {
+      id: '4',
+      title: 'Auth Middleware',
+      status: 'rejected',
+      category: 'Security',
+      aiConfidence: 28,
+      lastModified: new Date(Date.now() - 3600000 * 72),
+      platform: 'Backend',
+    },
+  ]
 
   const mockActivities = [
     { id: '1', type: 'ai_auto' as const, description: 'AI approved 47 resources', timestamp: new Date() },
@@ -33,99 +88,75 @@ export function DashboardClient() {
     { id: '3', type: 'alert' as const, description: 'Budget alert: 80% reached', timestamp: new Date(Date.now() - 7200000) },
   ]
 
-  const mockChartData = [
-    { date: '2026-02-26', accuracy: 91.2, target: 95 },
-    { date: '2026-02-27', accuracy: 92.5, target: 95 },
-    { date: '2026-02-28', accuracy: 91.8, target: 95 },
-    { date: '2026-03-01', accuracy: 93.1, target: 95 },
-    { date: '2026-03-02', accuracy: 92.9, target: 95 },
-    { date: '2026-03-03', accuracy: 94.2, target: 95 },
-    { date: '2026-03-04', accuracy: 94.2, target: 95 },
-  ]
-
   return (
-    <motion.div 
-      className="min-h-screen bg-background"
-      variants={pageLoadVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* Header */}
-      <motion.header 
-        className="h-16 border-b border-border px-6 flex items-center justify-between sticky top-0 bg-background z-50"
-        variants={headerVariants}
-      >
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🏛️</span>
-            <span className="font-semibold text-lg">Knowledge Graph Studio</span>
-          </div>
-        </div>
-        <div className="flex items-center gap-4">
-          <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-accent-foreground font-medium">
-            U
-          </div>
-        </div>
-      </motion.header>
+    <div className="flex min-h-screen bg-background">
+      {/* Sidebar */}
+      <Sidebar activeItem={activeItem} onNavigate={setActiveItem} />
       
-      {/* AI Status Bar */}
-      <motion.div variants={statusBarVariants}>
+      {/* Main Content */}
+      <motion.div 
+        className="flex-1"
+        variants={pageLoadVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* AI Status Bar */}
         <AIStatusBar
           queueCount={847}
           queueTotal={1000}
           budgetUsed={3.42}
           budgetTotal={5.00}
         />
-      </motion.div>
-      
-      {/* Main content */}
-      <main className="container mx-auto px-6 py-8">
-        {/* Stats Cards Row */}
-        <motion.div 
-          variants={statsCardVariants}
-        >
-          <StatsCards {...mockStats} />
-        </motion.div>
         
-        {/* Content Area */}
-        <motion.div 
-          className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8"
-          variants={dataGridVariants}
-        >
-          <motion.div 
-            className="lg:col-span-2"
-            variants={dataGridVariants}
-          >
-            <ResourceDatagrid
-              resources={[]}
-              onBulkApprove={(ids) => console.log('Approve:', ids)}
-              onBulkReject={(ids) => console.log('Reject:', ids)}
+        {/* Main Content Area */}
+        <main className="container mx-auto px-6 py-8">
+          {/* Stat Cards Row */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <StatCard
+              title="Total Resources"
+              value={mockStats.total.value}
+              trend={mockStats.total.trend}
+              trendUp={mockStats.total.trendUp}
+              icon={Database}
             />
-          </motion.div>
-          <motion.div variants={activityFeedVariants}>
+            <StatCard
+              title="Verified"
+              value={mockStats.verified.value}
+              trend={mockStats.verified.trend}
+              trendUp={mockStats.verified.trendUp}
+            />
+            <StatCard
+              title="In Queue"
+              value={mockStats.queue.value}
+              trend={mockStats.queue.trend}
+              trendUp={mockStats.queue.trendUp}
+            />
+            <StatCard
+              title="Errors"
+              value={mockStats.errors.value}
+              trend={mockStats.errors.trend}
+              trendUp={mockStats.errors.trendUp}
+            />
+          </div>
+          
+          {/* Accuracy Chart */}
+          <div className="mb-8">
+            <AccuracyAreaChart data={mockChartData} targetAccuracy={95} />
+          </div>
+          
+          {/* Resource Table + Activity Feed */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div className="lg:col-span-2">
+              <ResourceTable
+                data={mockResources}
+                onAction={(action, id) => console.log(action, id)}
+              />
+            </div>
             <ActivityFeed activities={mockActivities} />
-          </motion.div>
-        </motion.div>
+          </div>
+        </main>
         
-        {/* Accuracy Metrics */}
-        <motion.div variants={accuracyChartVariants}>
-          <AccuracyChart
-            data={mockChartData}
-            currentAccuracy={94.2}
-            targetAccuracy={95}
-            avgConfidence={87.3}
-          />
-        </motion.div>
-        
-        {/* Spacer for action bar */}
-        <div className="h-20" />
-      </main>
-      
-      {/* Action Bar (fixed bottom) */}
-      <motion.div 
-        className="fixed bottom-0 left-0 right-0"
-        variants={actionBarVariants}
-      >
+        {/* Action Bar (fixed bottom) */}
         <ActionBar
           selectedCount={0}
           onRunAI={() => console.log('Run AI Queue')}
@@ -134,6 +165,6 @@ export function DashboardClient() {
           onBulkReject={() => console.log('Bulk Reject')}
         />
       </motion.div>
-    </motion.div>
+    </div>
   )
 }
