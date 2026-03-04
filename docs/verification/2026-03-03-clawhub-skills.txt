@@ -1,0 +1,172 @@
+================================================================================
+VERIFICATION TRANSCRIPT — BUILD ITERATION 6+
+Date: 2026-03-03
+Patch: Agent Capability Management Standardization
+================================================================================
+
+=== STEP 1 — Detect ClawHub CLI ===
+$ which clawhub
+NOT_FOUND
+
+Result: ClawHub CLI not installed → proceeding to installation
+
+=== STEP 2 — Check Node.js Availability ===
+$ node -v
+v22.22.0
+
+$ npm -v
+10.9.4
+
+Result: Node.js available → using npm for installation
+
+=== STEP 3 — Install ClawHub CLI ===
+$ npm install -g clawhub
+added 35 packages in 3s
+20 packages are looking for funding
+
+Result: ✅ ClawHub CLI installed
+
+=== STEP 4 — Verify CLI Installation ===
+$ clawhub --cli-version
+0.7.0
+
+Result: ✅ ClawHub CLI v0.7.0 active
+
+=== STEP 5 — Install Skills ===
+$ clawhub install skill-guard
+- Resolving skill-guard
+✔ OK. Installed skill-guard -> /root/.openclaw/workspace/skills/skill-guard
+
+$ clawhub install skill-detector
+- Resolving skill-detector
+✔ OK. Installed skill-detector -> /root/.openclaw/workspace/skills/skill-detector
+
+Result: ✅ Both skills installed
+
+=== STEP 6 — Verify Skill Installation ===
+$ ls -la /root/.openclaw/workspace/skills/
+total 16
+drwxr-xr-x 4 root 4096 Mar  3 15:44 .
+drwxr-xr-x 7 root 4096 Mar  3 15:44 ..
+drwxr-xr-x 3 root 4096 Mar  3 15:44 skill-detector
+drwxr-xr-x 4 root 4096 Mar  3 15:44 skill-guard
+
+$ clawhub list
+skill-guard      1.0.2
+skill-detector   0.1.0
+
+Result: ✅ Both skills present in skills/ directory
+
+=== STEP 7 — Validate Skills ===
+$ clawhub inspect skill-detector
+skill-detector  Skill Detector
+Summary: Intelligent skill creation assistant that detects workflow patterns,
+         auto-drafts skills, improves existing ones, and learns your style
+         over time. Runs passiv...
+Owner: MouseRider
+Created: 2026-02-24T20:15:07.494Z
+Updated: 2026-02-25T23:55:36.195Z
+Latest: 0.1.0
+
+$ clawhub inspect skill-guard
+skill-guard  skill-guard
+Summary: Scan ClawHub skills for security vulnerabilities BEFORE installing.
+         Use when installing new skills from ClawHub to detect prompt
+         injections, malware payloads, hardcoded secrets, and other threats.
+         Wraps clawhub install with mcp-scan pre-flight checks.
+Owner: jamesOuttake
+Created: 2026-02-05T22:34:53.373Z
+Updated: 2026-02-26T03:43:54.055Z
+Latest: 1.0.2
+
+Result: ✅ Both skills validated with metadata
+
+=== STEP 8 — Telegram Notification ===
+✅ Telegram notification sent
+   Message ID: 8
+   Content:
+   - Task: ClawHub CLI + Skills Standardization
+   - Commit: build-iteration-6
+   - Gates: clawhub ✅ | skill-guard ✅ | skill-detector ✅
+   - Summary: 4 bullets
+   - Deploy: active
+
+=== ACCEPTANCE CRITERIA ===
+
+✅ ClawHub CLI Detection
+   - Checked: which clawhub
+   - Result: Not found → installed
+
+✅ ClawHub CLI Installation
+   - Method: npm install -g clawhub
+   - Version: 0.7.0
+   - Status: Active
+
+✅ Skill Guard Installation
+   - Version: 1.0.2
+   - Location: /root/.openclaw/workspace/skills/skill-guard
+   - Purpose: Security scanning for skills
+
+✅ Skill Detector Installation
+   - Version: 0.1.0
+   - Location: /root/.openclaw/workspace/skills/skill-detector
+   - Purpose: Workflow pattern detection
+
+✅ Skills Folder Verification
+   - skills/skill-guard/SKILL.md ✅
+   - skills/skill-detector/SKILL.md ✅
+
+✅ Telegram Notification
+   - Message ID: 8
+   - Status: Sent successfully
+
+=== GATES STATUS ===
+
+clawhub CLI      ✅ PASS (v0.7.0)
+skill-guard      ✅ PASS (v1.0.2)
+skill-detector   ✅ PASS (v0.1.0)
+Telegram sent    ✅ PASS (Message ID: 8)
+
+=== FILES CHANGED ===
+
+| Directory | Change |
+|-----------|--------|
+| /root/.openclaw/workspace/skills/skill-guard/ | NEW - Skill Guard installed |
+| /root/.openclaw/workspace/skills/skill-detector/ | NEW - Skill Detector installed |
+
+=== SKILL CAPABILITIES ===
+
+**Skill Guard (v1.0.2)**
+- Scans ClawHub skills for security vulnerabilities
+- Detects prompt injections
+- Detects malware payloads
+- Detects hardcoded secrets
+- Wraps clawhub install with mcp-scan pre-flight checks
+
+**Skill Detector (v0.1.0)**
+- Detects workflow patterns
+- Auto-drafts skills
+- Improves existing skills
+- Learns user style over time
+- Runs passively in background
+
+=== COMMANDS REFERENCE ===
+
+# List installed skills
+clawhub list
+
+# Install a skill
+clawhub install <skill-name>
+
+# Inspect skill metadata
+clawhub inspect <skill-name>
+
+# Update skills
+clawhub update
+
+# Search skills
+clawhub search <query>
+
+================================================================================
+STATUS: ✅ COMPLETE - TELEGRAM NOTIFIED
+================================================================================

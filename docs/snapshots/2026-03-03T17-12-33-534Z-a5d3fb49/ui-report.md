@@ -1,0 +1,90 @@
+# UI Analysis Report
+
+**Source:** https://square-ui-marketing-dashboard.vercel.app/
+**Generated:** 2026-03-03T17:12:54.796Z
+
+---
+
+## Layout Structure
+
+| Element | Detected |
+|---------|----------|
+| Sidebar | ✅ Yes (left) |
+| Header | ✅ Yes |
+| Main | ✅ Yes |
+
+---
+
+## Theme Support
+
+| Feature | Status |
+|---------|--------|
+| Dark Mode | ✅ Yes |
+| Theme Toggle | ❌ No |
+
+**Theme Classes Found:**
+- `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-7 shrink-0`
+- `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-5`
+- `inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive bg-primary text-primary-foreground hover:bg-primary/90 h-8 rounded-md gap-1.5 px-3 has-[&gt;svg]:px-2.5 w-full`
+- `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-7 -ml-2`
+- `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-9`
+- `lucide lucide-sun h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0`
+- `lucide lucide-moon absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100`
+- `inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg:not([class*='size-'])]:size-4 shrink-0 [&amp;_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50 size-8`
+- `lucide lucide-trending-up size-3.5 text-emerald-600 dark:text-emerald-400`
+- `text-sm font-medium text-emerald-600 dark:text-emerald-400`
+
+---
+
+## Components Detected
+
+| Component | Count |
+|-----------|-------|
+| Cards | 9 |
+| Tables | 1 |
+| Buttons | 33 |
+| Inputs | 1 |
+| Badges | 4 |
+
+---
+
+## Spacing Scale
+
+**Guessed System:** Tailwind (4px base)
+
+**Most Common Classes:**
+- `p-2`
+- `py-3`
+- `gap-2`
+- `px-2`
+- `gap-1`
+- `px-3`
+- `py-0`
+- `p-0`
+- `gap-3`
+- `p-3`
+
+---
+
+## Recommendations
+
+- ✅ Sidebar-first layout detected (matches Square UI pattern)
+- ⚠️  Dark mode detected but no toggle found
+- ✅ Card-based layout detected (9 cards)
+- ✅ Data tables present (1 tables)
+- 💡 Many buttons detected (33) - consider consistent button styles
+
+---
+
+## Implementation Notes for KGS
+
+Based on this analysis, here's what we should adopt:
+
+1. **Layout:** Keep sidebar-first approach
+2. **Theme:** Implement dark mode with next-themes
+3. **Components:** Use shadcn/ui for cards, tables, buttons
+4. **Spacing:** Follow Tailwind spacing scale (Tailwind (4px base))
+
+---
+
+*Generated by KGS UI Analyzer*

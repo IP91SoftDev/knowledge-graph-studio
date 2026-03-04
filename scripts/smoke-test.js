@@ -21,10 +21,21 @@ const http = require('http');
 
 const PORT = 3000;
 const HOST = '127.0.0.1';
+
+// Route Health Gate
+// - Public routes: expect 200
+// - Protected routes (unauthenticated): expect 307 (redirect to login)
 const ROUTES = [
-  { path: '/auth/login', expectStatus: 200, description: 'Login page' },
-  { path: '/auth/register', expectStatus: 200, description: 'Register page' },
-  { path: '/me', expectStatus: 307, description: 'Profile (redirect when not authed)' },
+  // Public routes
+  { path: '/', expectStatus: 200, description: 'Home/Landing', type: 'public' },
+  { path: '/auth/login', expectStatus: 200, description: 'Login page', type: 'public' },
+  { path: '/auth/register', expectStatus: 200, description: 'Register page', type: 'public' },
+  // Protected routes (should redirect when unauthenticated)
+  { path: '/me', expectStatus: 307, description: 'Profile', type: 'protected' },
+  { path: '/browse', expectStatus: 307, description: 'Browse', type: 'protected' },
+  { path: '/search', expectStatus: 307, description: 'Search', type: 'protected' },
+  { path: '/ingest', expectStatus: 307, description: 'Ingest', type: 'protected' },
+  { path: '/analytics', expectStatus: 307, description: 'Analytics', type: 'protected' },
 ];
 
 console.log('🔍 Starting smoke test...\n');
@@ -146,32 +157,42 @@ function cleanup() {
     
     console.log('✅ Server started\n');
     
-    console.log('🌐 Step 3: Testing required routes...\n');
+    console.log('🌐 Step 3: Route Health Gate\n');
     const results = [];
     
     for (const route of ROUTES) {
       try {
         const result = await checkEndpoint(route.path, route.expectStatus);
-        results.push({ ...result, status: 'PASS', description: route.description });
-        console.log(`✅ ${route.description.padEnd(30)} ${route.path.padEnd(20)} HTTP ${result.statusCode}`);
+        results.push({ ...result, status: 'PASS', description: route.description, type: route.type });
+        const typeLabel = route.type === 'public' ? 'PUBLIC' : 'PROT  ';
+        console.log(`✅ ${route.description.padEnd(15)} ${route.path.padEnd(20)} HTTP ${result.statusCode} [${typeLabel}]`);
       } catch (error) {
-        results.push({ path: route.path, status: 'FAIL', error: error.message, description: route.description });
-        console.log(`❌ ${route.description.padEnd(30)} ${route.path.padEnd(20)} ${error.message}`);
+        results.push({ path: route.path, status: 'FAIL', error: error.message, description: route.description, type: route.type });
+        const typeLabel = route.type === 'public' ? 'PUBLIC' : 'PROT  ';
+        console.log(`❌ ${route.description.padEnd(15)} ${route.path.padEnd(20)} ${error.message} [${typeLabel}]`);
       }
     }
     
-    console.log('\n' + '='.repeat(60));
+    console.log('\n' + '='.repeat(70));
     const passed = results.filter(r => r.status === 'PASS').length;
     const failed = results.filter(r => r.status === 'FAIL').length;
+    const publicPassed = results.filter(r => r.status === 'PASS' && r.type === 'public').length;
+    const publicTotal = results.filter(r => r.type === 'public').length;
+    const protectedPassed = results.filter(r => r.status === 'PASS' && r.type === 'protected').length;
+    const protectedTotal = results.filter(r => r.type === 'protected').length;
     
-    console.log(`Results: ${passed}/${results.length} passed, ${failed}/${results.length} failed`);
+    console.log('ROUTE HEALTH SUMMARY');
+    console.log('='.repeat(70));
+    console.log(`Public Routes:    ${publicPassed}/${publicTotal} passed`);
+    console.log(`Protected Routes: ${protectedPassed}/${protectedTotal} passed (redirect when unauthenticated)`);
+    console.log(`Overall:          ${passed}/${results.length} passed`);
     
     if (failed > 0) {
       console.log('\n❌ Smoke test FAILED\n');
       cleanup();
       process.exit(1);
     } else {
-      console.log('\n✅ Smoke test PASSED\n');
+      console.log('\n✅ Smoke test PASSED - All routes healthy\n');
       cleanup();
       process.exit(0);
     }

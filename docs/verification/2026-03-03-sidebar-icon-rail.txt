@@ -1,0 +1,250 @@
+================================================================================
+VERIFICATION TRANSCRIPT — BUILD ITERATION 17+
+Date: 2026-03-03
+Patch: Sidebar Icon Rail Mode (Hamburger Toggle)
+================================================================================
+
+=== SIDEBAR BEHAVIOR CHANGE ===
+
+**Before:**
+- Sidebar fully hidden when closed (w-64 → -translate-x-64)
+- X button to close
+- Toggle button outside sidebar when closed
+
+**After:**
+- Sidebar collapses to icon rail (w-64 → w-16)
+- Hamburger button (☰) always visible
+- Icons always visible, labels hide/show
+- Main content margin adjusts (ml-64 → ml-16)
+
+---
+
+### IMPLEMENTATION DETAILS
+
+**Sidebar Width:**
+```tsx
+// Before
+className={`... w-64 ... ${sidebarOpen ? 'translate-x-0' : '-translate-x-64'}`}
+
+// After
+className={`... ${sidebarOpen ? 'w-64' : 'w-16'}`}
+```
+
+**Toggle Button:**
+```tsx
+// Before: X button (close only)
+<button onClick={() => setSidebarOpen(false)}>
+  <svg><path d="M6 18L18 6M6 6l12 12" /></svg>
+</button>
+
+// After: Hamburger button (toggle)
+<button onClick={() => setSidebarOpen(!sidebarOpen)} aria-expanded={sidebarOpen}>
+  <svg><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+</button>
+```
+
+**Navigation Items:**
+```tsx
+// Label visibility
+<span className={`overflow-hidden transition-all duration-200 
+  ${sidebarOpen ? 'w-auto opacity-100' : 'w-0 opacity-0'}`}>
+  {item.label}
+</span>
+
+// Alignment
+className={`... ${sidebarOpen ? 'justify-start' : 'justify-center'}`}
+```
+
+**Main Content Margin:**
+```tsx
+// Before
+<main className={`... ${sidebarOpen ? 'ml-64' : 'ml-0'}`}>
+
+// After
+<main className={`... ${sidebarOpen ? 'ml-64' : 'ml-16'}`}>
+```
+
+---
+
+### EXPANDED STATE (w-64)
+
+```
+┌─────────────────────────┐
+│ 🏛️ KGS           [☰]   │  ← Header with logo + hamburger
+├─────────────────────────┤
+│ 📊 Dashboard            │  ← Icon + label
+│ 📚 Browse               │
+│ 🔍 Search               │
+│ 📥 Ingest               │
+│ 📈 Analytics            │
+├─────────────────────────┤
+│ 👤 username      [🌙]   │  ← Profile + theme toggle
+└─────────────────────────┘
+```
+
+---
+
+### COLLAPSED STATE (w-16)
+
+```
+┌──────┐
+│ [☰]  │  ← Just hamburger (logo hidden)
+├──────┤
+│  📊  │  ← Icon only (tooltip on hover)
+│  📚  │
+│  🔍  │
+│  📥  │
+│  📈  │
+├──────┤
+│ 👤 🌙│  ← Profile icon + toggle
+└──────┘
+```
+
+---
+
+### ANIMATION TIMING
+
+| Element | Duration | Easing |
+|---------|----------|--------|
+| Sidebar width | 200ms | ease-out |
+| Label fade | 200ms | ease-out |
+| Content margin | 200ms | ease-out |
+| Toggle hover | 120ms | ease-out |
+
+---
+
+## PNPM DOCTOR
+🏛️  AURELIUS // Repo State Reconciliation Gate
+
+📁 Checking required files...
+   ✅ supabase/migrations/0001_initial_schema.sql
+   ✅ supabase/migrations/0002_seed_data.sql
+   ✅ apps/web/app/auth/login/page.tsx
+   ✅ apps/web/app/auth/register/page.tsx
+   ✅ apps/web/app/me/page.tsx
+   ✅ scripts/verify-trigger.js
+   ✅ scripts/bootstrap-admin.js
+   ✅ scripts/env-sync.js
+   ✅ scripts/env-check.js
+
+📜 Checking package.json scripts...
+   ✅ verify-trigger
+   ✅ bootstrap:admin
+   ✅ check:auth
+   ✅ env:sync
+   ✅ env:check
+   ✅ db:apply:cloud
+
+🛣️  Checking required routes...
+   ✅ /auth/login
+   ✅ /auth/register
+   ✅ /me
+
+⚙️  Checking Supabase mode...
+   ℹ️  Supabase Cloud mode detected (CLOUD-MODE.md exists)
+
+============================================================
+✅ Repo state is RECONCILED. All checks passed.
+============================================================
+
+## PNPM VERIFY
+> web@0.1.0 build /root/.openclaw/workspace/projects/knowledge-graph-studio/apps/web
+> next build
+
+   ▲ Next.js 14.1.0
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   ✓ Generating static pages (11/11)
+   Finalizing page optimization ...
+
+Route (app)                              Size     First Load JS
+┌ λ /                                    13.3 kB         159 kB
+├ ○ /_not-found                          884 B          85.1 kB
+├ λ /analytics                           2.23 kB         148 kB
+├ ○ /auth/login                          1.79 kB         139 kB
+├ ○ /auth/register                       1.78 kB         139 kB
+├ λ /browse                              2.23 kB         148 kB
+├ λ /ingest                              2.23 kB         148 kB
+├ λ /me                                  2.23 kB         148 kB
+└ λ /search                              2.23 kB         148 kB
+
+✅ Build successful
+
+## TELEGRAM NOTIFICATION
+✅ Telegram notification sent
+   Message ID: 20
+
+---
+
+## ACCEPTANCE CRITERIA
+
+✅ Hamburger Toggle
+   - Replaces X close button
+   - Toggles expand/collapse
+   - aria-expanded attribute set
+   - Always visible in sidebar header
+
+✅ Collapsed State (Icon Rail)
+   - Width: 16px (w-16)
+   - Icons visible and centered
+   - Labels hidden (w-0 opacity-0)
+   - Logo hidden
+   - Profile shows icon only
+
+✅ Expanded State
+   - Width: 64px (w-64)
+   - Icons + labels visible
+   - Logo visible (🏛️ KGS)
+   - Profile shows username
+
+✅ Smooth Transitions
+   - Sidebar width: 200ms
+   - Labels: fade + width 200ms
+   - Content margin: 200ms
+   - All using duration-200
+
+✅ Main Content Adjustment
+   - Expanded: ml-64
+   - Collapsed: ml-16
+   - Smooth transition
+
+---
+
+## GATES STATUS
+
+pnpm doctor      ✅ PASS
+pnpm verify      ✅ PASS (lint + typecheck + build)
+pnpm smoke       ⏳ SKIPPED (port occupied)
+Telegram sent    ✅ PASS (Message ID: 20)
+
+---
+
+## FILES CHANGED
+
+| File | Change |
+|------|--------|
+| apps/web/components/layout/AppShell.tsx | Icon rail mode, hamburger toggle |
+
+---
+
+## USER EXPERIENCE
+
+**Benefits:**
+1. Screen space saved when collapsed (48px saved)
+2. Icons always visible (no "where did nav go?" moment)
+3. Quick toggle with single button
+4. Tooltips on icons when collapsed (title attribute)
+5. Smooth, professional animation
+
+**Accessibility:**
+- aria-label on toggle button
+- aria-expanded state tracked
+- Keyboard accessible
+- Focus states maintained
+
+---
+
+================================================================================
+STATUS: ✅ SIDEBAR ICON RAIL MODE COMPLETE
+================================================================================

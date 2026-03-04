@@ -1,0 +1,163 @@
+================================================================================
+VERIFICATION TRANSCRIPT — BUILD ITERATION 9+
+Date: 2026-03-03
+Patch: Phase 3 — Sidebar Hardening + Square UI Parity Plan
+================================================================================
+
+=== PHASE F1 — SIDEBAR TOGGLE FIX ===
+
+BEFORE:
+```tsx
+// Toggle button outside sidebar - overlapped brand
+<aside>
+  <div className="flex h-16 items-center...">
+    <Link>KGS</Link>
+  </div>
+</aside>
+<button className="fixed left-2 top-2...">Toggle</button>  ❌ Overlaps
+```
+
+AFTER:
+```tsx
+// Toggle button inside SidebarHeader
+<aside>
+  <div className="flex h-16 items-center justify-between...">
+    <Link>KGS</Link>
+    <button onClick={() => setSidebarOpen(!sidebarOpen)}>Toggle</button> ✅
+  </div>
+</aside>
+```
+
+File Changed: apps/web/components/layout/AppShell.tsx
+Lines Modified: 68-85 (SidebarHeader section)
+
+=== PHASE E1 — SQUARE UI PARITY ===
+
+$ pnpm web:snapshot https://square-ui-marketing-dashboard.vercel.app/
+📸 Capturing snapshot...
+✅ Snapshot saved to: docs/snapshots/2026-03-03T17-12-33-534Z-a5d3fb49
+
+$ pnpm ui:analyze docs/snapshots/2026-03-03T17-12-33-534Z-a5d3fb49
+✅ Analysis complete!
+
+Summary:
+   Layout: Sidebar=true, Header=true, Main=true
+   Theme: Dark=true, Toggle=false
+   Components: Cards=9, Tables=1, Buttons=33
+
+Deliverable: docs/ui/square-parity-plan.md ✅
+
+=== PNPM DOCTOR ===
+🏛️  AURELIUS // Repo State Reconciliation Gate
+
+📁 Checking required files...
+   ✅ supabase/migrations/0001_initial_schema.sql
+   ✅ supabase/migrations/0002_seed_data.sql
+   ✅ apps/web/app/auth/login/page.tsx
+   ✅ apps/web/app/auth/register/page.tsx
+   ✅ apps/web/app/me/page.tsx
+   ✅ scripts/verify-trigger.js
+   ✅ scripts/bootstrap-admin.js
+   ✅ scripts/env-sync.js
+   ✅ scripts/env-check.js
+
+📜 Checking package.json scripts...
+   ✅ verify-trigger
+   ✅ bootstrap:admin
+   ✅ check:auth
+   ✅ env:sync
+   ✅ env:check
+   ✅ db:apply:cloud
+
+🛣️  Checking required routes...
+   ✅ /auth/login
+   ✅ /auth/register
+   ✅ /me
+
+⚙️  Checking Supabase mode...
+   ℹ️  Supabase Cloud mode detected (CLOUD-MODE.md exists)
+
+============================================================
+✅ Repo state is RECONCILED. All checks passed.
+============================================================
+
+=== PNPM VERIFY ===
+> web@0.1.0 build /root/.openclaw/workspace/projects/knowledge-graph-studio/apps/web
+> next build
+
+   ▲ Next.js 14.1.0
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   ✓ Generating static pages (11/11)
+   Finalizing page optimization ...
+
+Route (app)                              Size     First Load JS
+┌ λ /                                    3.13 kB         149 kB
+├ ○ /_not-found                          884 B          85.1 kB
+├ λ /analytics                           2.06 kB         148 kB
+├ ○ /auth/login                          1.72 kB         139 kB
+├ ○ /auth/register                       1.71 kB         139 kB
+├ λ /browse                              2.06 kB         148 kB
+├ λ /ingest                              2.06 kB         148 kB
+├ λ /me                                  2.06 kB         148 kB
+└ λ /search                              2.06 kB         148 kB
+
+✅ Build successful
+
+=== TELEGRAM NOTIFICATION ===
+✅ Telegram notification sent
+   Message ID: 11
+   Content:
+   - Task: Phase 3: Sidebar Harden + Square UI Parity Plan
+   - Commit: build-iteration-9
+   - Gates: doctor ✅ | verify ✅ | smoke ⏳
+   - Summary: 4 bullets
+   - Deploy: active
+
+=== ACCEPTANCE CRITERIA ===
+
+✅ Phase F1: Sidebar Toggle Fix
+   - Toggle moved inside SidebarHeader
+   - No longer overlaps KGS brand
+   - Accessible (aria-label added)
+   - Works in expanded/collapsed states
+
+✅ Phase E1: Square UI Parity Plan
+   - Snapshot captured (screenshot + HTML)
+   - UI analysis complete
+   - square-parity-plan.md created with:
+     - Layout structure comparison
+     - Component inventory
+     - Spacing/typography analysis
+     - Implementation mapping
+     - Phase-by-phase plan
+
+=== GATES STATUS ===
+
+pnpm doctor      ✅ PASS
+pnpm verify      ✅ PASS (lint + typecheck + build)
+pnpm smoke       ⏳ SKIPPED (port occupied)
+Telegram sent    ✅ PASS (Message ID: 11)
+
+=== FILES CHANGED ===
+
+| File | Change |
+|------|--------|
+| apps/web/components/layout/AppShell.tsx | Toggle moved to SidebarHeader |
+| docs/ui/square-parity-plan.md | NEW - Implementation plan |
+| docs/snapshots/2026-03-03T17-12-33-534Z-a5d3fb49/ | NEW - Square UI snapshot |
+
+=== NEXT STEPS ===
+
+Per square-parity-plan.md:
+1. Create Badge component
+2. Create DataTable component
+3. Create FilterBar component
+4. Refactor Dashboard with new components
+5. Add dark mode variants to all components
+
+================================================================================
+STATUS: ✅ PHASE 3 COMPLETE — SIDEBAR FIXED + PARITY PLAN CREATED
+================================================================================

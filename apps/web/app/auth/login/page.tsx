@@ -1,24 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const router = useRouter();
+  const supabaseClient = createClient();
+  
+  // All hooks must be at top level, before any conditional returns
+  const [loading, setLoading] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'password' | 'magic'>('password');
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
-  const supabase = createClient();
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        router.push('/');
+      } else {
+        setCheckingAuth(false);
+      }
+    };
+    checkAuth();
+  }, [router, supabaseClient.auth]);
+
+  if (checkingAuth) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="text-center">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          <p className="text-sm text-muted-foreground">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handlePasswordLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabaseClient.auth.signInWithPassword({
       email,
       password,
     });
@@ -28,7 +55,7 @@ export default function LoginPage() {
     } else {
       setMessage('Login successful! Redirecting...');
       setTimeout(() => {
-        router.push('/me');
+        router.push('/');
       }, 1000);
     }
 
@@ -40,7 +67,7 @@ export default function LoginPage() {
     setLoading(true);
     setMessage(null);
 
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabaseClient.auth.signInWithOtp({
       email,
     });
 
@@ -54,26 +81,26 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md space-y-8 rounded-lg bg-white p-8 shadow">
-        <div>
-          <h2 className="mt-2 text-center text-3xl font-bold tracking-tight text-gray-900">
+    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md space-y-6 rounded-xl border border-border/50 bg-card p-6 shadow-sm dark:border-white/10 dark:bg-white/[0.02]">
+        <div className="space-y-2 text-center">
+          <h2 className="text-2xl font-semibold tracking-tight text-foreground">
             Knowledge Graph Studio
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Sign in to your account
           </p>
         </div>
 
         {/* Login Method Toggle */}
-        <div className="flex rounded-md shadow-sm">
+        <div className="flex rounded-lg border border-border/50 bg-muted/30 p-1 dark:border-white/10">
           <button
             type="button"
             onClick={() => setLoginMethod('password')}
-            className={`flex-1 rounded-l-md border px-4 py-2 text-sm font-medium ${
+            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-all duration-120 ${
               loginMethod === 'password'
-                ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                ? 'bg-background text-foreground shadow-sm dark:bg-white/[0.05]'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Password
@@ -81,10 +108,10 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={() => setLoginMethod('magic')}
-            className={`flex-1 rounded-r-md border border-l-0 px-4 py-2 text-sm font-medium ${
+            className={`flex-1 rounded-md px-4 py-2 text-sm font-medium transition-all duration-120 ${
               loginMethod === 'magic'
-                ? 'border-indigo-500 bg-indigo-50 text-indigo-700'
-                : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-50'
+                ? 'bg-background text-foreground shadow-sm dark:bg-white/[0.05]'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Magic Link
@@ -92,8 +119,8 @@ export default function LoginPage() {
         </div>
 
         {loginMethod === 'password' ? (
-          <form className="mt-8 space-y-6" onSubmit={handlePasswordLogin}>
-            <div>
+          <form className="space-y-4" onSubmit={handlePasswordLogin}>
+            <div className="space-y-2">
               <label htmlFor="email" className="sr-only">
                 Email address
               </label>
@@ -105,11 +132,11 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="relative block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10"
                 placeholder="Enter your email"
               />
             </div>
-            <div>
+            <div className="space-y-2">
               <label htmlFor="password" className="sr-only">
                 Password
               </label>
@@ -121,14 +148,14 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="relative block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10"
                 placeholder="Enter your password"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+              className="inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -136,8 +163,8 @@ export default function LoginPage() {
               <p
                 className={`text-sm ${
                   message.startsWith('Error')
-                    ? 'text-red-600'
-                    : 'text-green-600'
+                    ? 'text-destructive'
+                    : 'text-emerald-600 dark:text-emerald-500'
                 }`}
               >
                 {message}
@@ -145,8 +172,8 @@ export default function LoginPage() {
             )}
           </form>
         ) : (
-          <form className="mt-8 space-y-6" onSubmit={handleMagicLinkLogin}>
-            <div>
+          <form className="space-y-4" onSubmit={handleMagicLinkLogin}>
+            <div className="space-y-2">
               <label htmlFor="email" className="sr-only">
                 Email address
               </label>
@@ -158,14 +185,14 @@ export default function LoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="relative block w-full rounded-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                className="flex h-10 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10"
                 placeholder="Enter your email"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-50"
+              className="inline-flex h-10 w-full items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
             >
               {loading ? 'Sending...' : 'Send Magic Link'}
             </button>
@@ -173,8 +200,8 @@ export default function LoginPage() {
               <p
                 className={`text-sm ${
                   message.startsWith('Error')
-                    ? 'text-red-600'
-                    : 'text-green-600'
+                    ? 'text-destructive'
+                    : 'text-emerald-600 dark:text-emerald-500'
                 }`}
               >
                 {message}
@@ -183,11 +210,11 @@ export default function LoginPage() {
           </form>
         )}
 
-        <div className="text-center text-sm text-gray-600">
+        <div className="text-center text-sm text-muted-foreground">
           Don&apos;t have an account?{' '}
           <a
             href="/auth/register"
-            className="font-medium text-indigo-600 hover:text-indigo-500"
+            className="font-medium text-primary hover:text-primary/80"
           >
             Register
           </a>

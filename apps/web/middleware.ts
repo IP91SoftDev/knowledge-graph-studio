@@ -49,7 +49,7 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protected routes
+  // Protected routes (require auth)
   const protectedPaths = [
     '/browse',
     '/search',
@@ -57,13 +57,14 @@ export async function middleware(request: NextRequest) {
     '/analytics',
     '/settings',
     '/resource',
+    '/me',
   ];
   const isProtectedPath = protectedPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
 
   // Auth routes (redirect away if already logged in)
-  const authPaths = ['/auth/login', '/auth/verify'];
+  const authPaths = ['/auth/login', '/auth/register', '/auth/verify'];
   const isAuthPath = authPaths.some((path) =>
     request.nextUrl.pathname.startsWith(path)
   );
